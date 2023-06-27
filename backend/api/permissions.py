@@ -24,7 +24,8 @@ class IsAuthorOrReadOnly(BasePermission):
 
 class IsAdminOrReadOnly(BasePermission):
     """
-    Разрешение: только администратор может изменять, остальные могут только читать.
+    Разрешение: только администратор может изменять,
+    остальные могут только читать.
     """
 
     def has_permission(self, request, view):

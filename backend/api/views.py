@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -12,13 +11,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from recipes.models import (
-    Cart, FavoriteRecipe, Follow, Ingredient, IngredientInRecipe, Recipe, Tag
-)
+    Cart, FavoriteRecipe, Follow, Ingredient, Recipe, Tag)
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (
     CustomUserSerializer, FollowSerializer, IngredientSerializer,
-    RecipeAddSerializer, RecipeMinifiedSerializer, RecipeSerializer, TagSerializer
-)
+    RecipeAddSerializer, RecipeMinifiedSerializer,
+    RecipeSerializer, TagSerializer)
 from .utils import add_del_recipesview
 
 User = get_user_model()
@@ -169,9 +167,11 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
         content = "Shopping Cart:\n"
         for item in shopping_cart:
-            content += f"- {item.ingredient.name}: {item.quantity} {item.unit}\n"
+            content += (
+                f"- {item.ingredient.name}: {item.quantity} {item.unit}\n")
 
         response = HttpResponse(content, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
+        response['Content-Disposition'] = (
+            'attachment; filename="shopping_cart.txt"')
 
         return response

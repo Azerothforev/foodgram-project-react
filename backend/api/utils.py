@@ -12,7 +12,8 @@ def add_del_recipesview(request, model, recipeminifiedserializer, **kwargs):
     Args:
         request (HttpRequest): HTTP-запрос.
         model (Model): Модель для создания/удаления связи с рецептом.
-        recipeminifiedserializer (Serializer): Сериализатор для минимальной информации о рецепте.
+        recipeminifiedserializer (Serializer):
+        Сериализатор для минимальной информации о рецепте.
         **kwargs: Дополнительные аргументы.
 
     Returns:

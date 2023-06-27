@@ -14,8 +14,9 @@ class Tag(models.Model):
         validators=[
             RegexValidator(
                 regex=r'^#[A-Za-z0-9]{0,6}$',
-                message='Неверное значение. Допускаются только цифры, символ #('
-                'обратите внимание, что символ # должен быть первым ) и английские буквы..'
+                message='Неверное значение. Допускаются только цифры, '
+                'символ #(обратите внимание,что символ # должен быть первым )'
+                'и английские буквы.'
             )
         ],
         verbose_name='Цвет тега'
@@ -39,8 +40,10 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     """Модель для хранения ингредиентов."""
 
-    name = models.CharField(max_length=200, verbose_name='Название ингредиента')
-    measurement_unit = models.CharField(max_length=200, verbose_name='Единица измерения')
+    name = models.CharField(
+        max_length=200, verbose_name='Название ингредиента')
+    measurement_unit = models.CharField(
+        max_length=200, verbose_name='Единица измерения')
 
     class Meta:
         ordering = ('name',)
@@ -72,7 +75,8 @@ class Recipe(models.Model):
     cooking_time = models.PositiveIntegerField(
         'Время приготовления',
         validators=[
-            MinValueValidator(1, message='Время приготовления должно быть не меньше одной минуты')
+            MinValueValidator(1, message='Время приготовления должно '
+                              'быть не меньше одной минуты')
         ]
     )
 
@@ -123,7 +127,8 @@ class FavoriteRecipe(models.Model):
         related_name='favorited_by',
         verbose_name='Рецепт'
     )
-    date_added = models.DateTimeField(default=timezone.now, verbose_name='Дата добавления')
+    date_added = models.DateTimeField(
+        default=timezone.now, verbose_name='Дата добавления')
 
     class Meta:
         ordering = ('user',)
