@@ -181,15 +181,13 @@ class RecipeAddSerializer(serializers.ModelSerializer):
 
         if len(ingredients) == 0:
             raise serializers.ValidationError(
-                'Выберите хотя бы 1 ингредиент из списка.'
-                )
+                'Выберите хотя бы 1 ингредиент из списка.')
 
         ingredients_id = []
         for ingredient in ingredients:
             if ingredient.get('id') in ingredients_id:
                 raise serializers.ValidationError(
-                    'Ингредиенты не могут повторяться. Проверьте свой рецепт.'
-                    )
+                    'Ингредиенты не могут повторяться. Проверьте свой рецепт.')
             if ingredient.get('amount') in (None, 0):
                 raise serializers.ValidationError(
                     'Количество ингредиента обязательно для заполнения.'
