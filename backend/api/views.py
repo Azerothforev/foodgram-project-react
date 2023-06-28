@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from recipes.models import (
-    Cart, FavoriteRecipe, Follow, Ingredient, Recipe, Tag)
+    ShopingCart, FavoriteRecipe, Follow, Ingredient, Recipe, Tag)
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (
     CustomUserSerializer, FollowSerializer, IngredientSerializer,
@@ -27,7 +27,7 @@ class CustomUsersViewSet(UserViewSet):
 
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = (TokenAuthentication,)
     pagination_class = PageNumberPagination
 
     @action(
@@ -137,7 +137,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def cart(self, request, **kwargs):
         """Добавить или удалить рецепт из списка покупок."""
         return add_del_recipesview(
-            request, Cart, RecipeMinifiedSerializer, **kwargs
+            request, ShopingCart, RecipeMinifiedSerializer, **kwargs
         )
 
     @action(
@@ -163,7 +163,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         """
         user = request.user
 
-        shopping_cart = Cart.objects.filter(user=user)
+        shopping_cart = ShopingCart.objects.filter(user=user)
 
         content = "Shopping Cart:\n"
         for item in shopping_cart:

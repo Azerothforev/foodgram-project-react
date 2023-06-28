@@ -1,10 +1,9 @@
 import os
-from pathlib import Path
+from dotenv import load_dotenv
 
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = (
-    'django-insecure-6uap4w_lf88y0rbcel((gsz+$r+7)og#c=k1f1+(ul!dr%^gh7')
+load_dotenv()
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 
 DEBUG = True
@@ -63,7 +62,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'foodgram.sqlite3'),
     }
 }
 
@@ -84,7 +83,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 

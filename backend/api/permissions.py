@@ -19,7 +19,10 @@ class IsAuthorOrReadOnly(BasePermission):
         """
         Проверяет, имеет ли пользователь право доступа к объекту.
         """
-        return obj.author == request.user
+        return (
+            request.method in SAFE_METHODS
+            or obj.author == request.user
+        )
 
 
 class IsAdminOrReadOnly(BasePermission):

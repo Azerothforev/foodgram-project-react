@@ -7,18 +7,6 @@ USER_EMAIL_MAX_LENGTH = 254
 USER_USERNAME_MAX_LENGTH = 150
 
 
-def role_max_length(role_list):
-    """
-    Возвращает максимальную длину роли из списка.
-    """
-
-    max_length = 0
-    for role in role_list:
-        if len(role[0]) > max_length:
-            max_length = len(role[0])
-    return max_length
-
-
 class FoodgramUser(AbstractUser):
     """
     Модель пользователей.
@@ -39,23 +27,21 @@ class FoodgramUser(AbstractUser):
     status = models.CharField(
         choices=ROLE_CHOICES,
         default=USER,
-        max_length=role_max_length(ROLE_CHOICES),
+        max_length=20,
         verbose_name='Статус пользователя на сайте'
     )
     username = models.CharField(
         max_length=USER_USERNAME_MAX_LENGTH,
         unique=True,
-        validators=[UnicodeUsernameValidator()],
+        validators=(UnicodeUsernameValidator(),),
         verbose_name='Никнейм'
     )
     first_name = models.CharField(
         max_length=30,
-        blank=False,
         verbose_name='Имя'
     )
     last_name = models.CharField(
         max_length=150,
-        blank=False,
         verbose_name='Фамилия'
     )
     password = models.CharField(

@@ -1,10 +1,11 @@
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserSerializer
-from rest_framework import serializers
 from drf_base64.fields import Base64ImageField
+from rest_framework import serializers
+
 from recipes.models import (
     FavoriteRecipe, IngredientInRecipe, Ingredient,
-    Recipe, Follow, Tag, Cart
+    Recipe, Follow, Tag, ShopingCart
 )
 
 User = get_user_model()
@@ -30,8 +31,7 @@ class CustomUserSerializer(UserSerializer):
         request = self.context.get('request')
         if request:
             user = request.user
-            if Follow.objects.filter(author_id=obj.id, user=user).exists():
-                return True
+            return Follow.objects.filter(author_id=obj.id, user=user).exists()
         return False
 
 
@@ -42,7 +42,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = '__all__'
+        fields = ('id', 'name', 'color', 'slug')
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -52,7 +52,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ingredient
-        fields = '__all__'
+        fields = ('id', 'name', 'measurement_unit')
 
 
 class IngredientInRecipesSerializer(serializers.ModelSerializer):
@@ -124,11 +124,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         ли рецепт в избранное у пользователя.
         """
         request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            if FavoriteRecipe.objects.filter(recipe_id=obj.id,
-                                             user=request.user).exists():
-                return True
-        return False
+        return (request and request.user.is_authenticated and
+                FavoriteRecipe.objects.filter(recipe_id=obj.id,
+                                              user=request.user).exists())
 
     def get_is_in_shopping_cart(self, obj):
         """
@@ -136,11 +134,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         ли рецепт в корзину у пользователя.
         """
         request = self.context.get('request')
-        if request:
-            user = request.user
-            if Cart.objects.filter(recipe_id=obj.id, user=user).exists():
-                return True
-        return False
+        return request and ShopingCart.objects.filter(
+                recipe_id=obj.id, user=request.user).exists()
 
 
 class RecipeAddSerializer(serializers.ModelSerializer):
@@ -164,12 +159,16 @@ class RecipeAddSerializer(serializers.ModelSerializer):
 
     def validate_tags(self, data):
         """
-        Проверяет, выбраны ли хотя бы один тег.
+        Проверяет, выбраны ли хотя бы один тег и отсутствуют
+        повторяющиеся теги.
         """
         tags = data
 
         if tags is None or len(tags) == 0:
             raise serializers.ValidationError('Выберите хотя бы 1 тег.')
+
+        if len(tags) != len(set(tags)):
+            raise serializers.ValidationError('Теги не должны повторяться.')
 
         return data
 
