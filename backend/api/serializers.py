@@ -124,9 +124,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         ли рецепт в избранное у пользователя.
         """
         request = self.context.get('request')
-        return (request and request.user.is_authenticated and
-                FavoriteRecipe.objects.filter(recipe_id=obj.id,
-                                              user=request.user).exists())
+        return (
+            request
+            and request.user.is_authenticated
+            and FavoriteRecipe.objects.filter(
+                recipe_id=obj.id,
+                user=request.user
+            ).exists()
+        )
 
     def get_is_in_shopping_cart(self, obj):
         """
@@ -134,8 +139,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         ли рецепт в корзину у пользователя.
         """
         request = self.context.get('request')
-        return request and ShopingCart.objects.filter(
-                recipe_id=obj.id, user=request.user).exists()
+        return (
+            request
+            and ShopingCart.objects.filter(
+                recipe_id=obj.id,
+                user=request.user
+            ).exists()
+        )
 
 
 class RecipeAddSerializer(serializers.ModelSerializer):
