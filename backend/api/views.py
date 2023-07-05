@@ -3,37 +3,36 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from django.db.models import Sum
 from rest_framework import status, viewsets
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+
 from recipes.models import (
-    ShopingCart, FavoriteRecipe, Follow, Ingredient, Recipe, Tag)
+    ShopingCart, FavoriteRecipe, Follow,
+    Ingredient, Recipe, Tag, IngredientInRecipe)
 from .permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from .serializers import (
     CustomUserSerializer, FollowSerializer, IngredientSerializer,
     RecipeAddSerializer, RecipeMinifiedSerializer,
     RecipeSerializer, TagSerializer)
 from .utils import add_del_recipesview
+from .filters import IngredientsFilter, RecipesFilter
 
 User = get_user_model()
 
 
 class CustomUsersViewSet(UserViewSet):
     """Вьюсет для обработки всех запросов от пользователей."""
-
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
-    authentication_classes = (TokenAuthentication,)
-    pagination_class = PageNumberPagination
 
     @action(
         detail=True,
         methods=['POST'],
-        permission_classes=(IsAuthenticated,),
+        permission_classes=(IsAuthenticated,)
     )
     def subscribe(self, request, **kwargs):
         """Подписаться на пользователя."""
@@ -81,10 +80,12 @@ class CustomUsersViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         """
-        Возвращает авторов, на которых подписан текущий пользователь.
+        Возвращает пользователей,
+        на которых подписан текущий пользователь.
         В выдачу добавляются рецепты.
         """
-        subscriptions_data = User.objects.filter(followers__user=request.user)
+        subscriptions_data = User.objects.filter(
+            followers__user=request.user)
 
         page = self.paginate_queryset(subscriptions_data)
         serializer = FollowSerializer(
@@ -101,6 +102,7 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -109,6 +111,8 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
+    filterset_class = IngredientsFilter
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
@@ -118,6 +122,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
+    filterset_class = RecipesFilter
 
     def get_serializer_class(self):
         """
@@ -133,6 +138,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         detail=True,
         methods=['POST', 'DELETE'],
         permission_classes=(IsAuthenticated,),
+        url_path='shopping_cart'
     )
     def cart(self, request, **kwargs):
         """Добавить или удалить рецепт из списка покупок."""
@@ -153,25 +159,22 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=False,
-        methods=['GET'],
-        permission_classes=[IsAuthenticated],
+        permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
-        """
-        Скачать список покупок в формате TXT.
-        Доступно только авторизованным пользователям.
-        """
-        user = request.user
+        """Скачать файл со списком покупок. Формат TXT."""
+        shopping_cart = IngredientInRecipe.objects.filter(
+            recipe__shoppingcart_recipe__user=request.user,
+        ).order_by('ingredient__name').values_list(
+            'ingredient__name',
+            'ingredient__measurement_unit'
+        ).annotate(amount=Sum('amount'))
 
-        shopping_cart = ShopingCart.objects.filter(user=user)
+        shopping_list = f'Список покупок {request.user}:\n'
+        for iter, (name, unit, amount) in enumerate(shopping_cart, start=1):
+            shopping_list += f'\n {iter}. {name} ({unit}) - {amount}'
 
-        content = "Shopping Cart:\n"
-        for item in shopping_cart:
-            content += (
-                f"- {item.ingredient.name}: {item.quantity} {item.unit}\n")
-
-        response = HttpResponse(content, content_type='text/plain')
-        response['Content-Disposition'] = (
-            'attachment; filename="shopping_cart.txt"')
-
+        filename = 'data.txt'
+        response = HttpResponse(shopping_list, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
         return response

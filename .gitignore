@@ -27,6 +27,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -58,8 +59,8 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-db.sqlite3
-db.sqlite3-journal
+foodgram.sqlite3
+foodgram.sqlite3-journal
 
 # Flask stuff:
 instance/

@@ -1,0 +1,6 @@
+venv
+.git
+foodgram.sqlite3
+.idea
+.vscode
+.env
