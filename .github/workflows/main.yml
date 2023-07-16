@@ -116,14 +116,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
       - name: Copy docker-compose.yml via ssh
-        uses: appleboy/ssh-action@master
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          script: |
-            sudo scp -o StrictHostKeyChecking=no docker-compose.production.yml ${{ secrets.USER }}@${{ secrets.HOST }}:/home/yc-user/foodgram/docker-compose.production.yml
+          source: "docker-compose.production.yml"
+          target: "foodgram"
       - name: Executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
         with:
