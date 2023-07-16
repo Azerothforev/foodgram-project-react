@@ -123,7 +123,16 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "docker-compose.production.yml"
-          target: "foodgram"
+          target: "/tmp/docker-compose.production.yml" 
+      - name: Move docker-compose.yml using sudo
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            sudo mv /tmp/docker-compose.production.yml /home/yc-user/foodgram/docker-compose.production.yml
       - name: Executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
         with:
