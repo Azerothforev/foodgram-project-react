@@ -1,6 +1,6 @@
 # Файл main.yml
 # Имя workflow
-name: Main Foodgram Workflow
+name: Main Foodgramm Workflow
 # Перечень событий-триггеров, при которых должен запускаться workflow
 on:
   # Событие push возникает,
