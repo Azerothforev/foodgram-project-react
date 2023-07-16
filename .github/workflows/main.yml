@@ -132,7 +132,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            sudo mv /tmp/docker-compose.production.yml /home/yc-user/foodgram/docker-compose.production.yml
+            sudo mv /tmp/docker-compose.production.yml /home/yc-user/foodgram
       - name: Executing remote ssh commands to deploy
         uses: appleboy/ssh-action@master
         with:
