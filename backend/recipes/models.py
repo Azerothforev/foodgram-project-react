@@ -153,11 +153,11 @@ class IngredientInRecipe(models.Model):
         verbose_name = 'Ингредиент и рецепт'
         verbose_name_plural = 'Ингредиенты и рецепты'
         constraints = [
-                models.UniqueConstraint(
-                    fields=['ingredient', 'recipe'],
-                    name='ingredient_in_recipe_unique',
-                ),
-            ]
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe'],
+                name='ingredient_in_recipe_unique',
+            )
+        ]
 
     def __str__(self):
         return format_string(self.ingredient.name, self.recipe.name)

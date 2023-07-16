@@ -231,7 +231,7 @@ class RecipeAddSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-    
+
     def to_representation(self, instance):
         """Переопределение Response-ответа."""
         context = {'request': self.context.get('request')}
@@ -263,7 +263,8 @@ class FollowSerializer(CustomUserSerializer):
         user = self.context.get('request').user
         author = self.instance
         if user == author:
-            raise serializers.ValidationError('Нельзя подписаться на самого себя.')
+            raise serializers.ValidationError('Нельзя подписаться на '
+                                              'самого себя.')
         if Follow.objects.filter(user=user, author=author).exists():
             raise serializers.ValidationError(f'Вы уже подписаны на {author}.')
         return data

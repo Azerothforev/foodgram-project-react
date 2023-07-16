@@ -68,7 +68,7 @@ class FoodgramUser(AbstractUser):
     @property
     def is_admin_role(self):
         return self.status == self.ADMIN
-    
+
     @property
     def get_recipes_count(self):
         return self.recipe.count()
