@@ -252,8 +252,9 @@ class FollowSerializer(CustomUserSerializer):
 
     class Meta(CustomUserSerializer.Meta):
         fields = (
-            CustomUserSerializer.Meta.fields + ('recipes', 'recipes_count',))
-        read_only_fields = ('email', 'username',)
+            CustomUserSerializer.Meta.fields + ('recipes', 'recipes_count',)
+        )
+        read_only_fields = ('email', 'username', 'first_name', 'last_name')
 
     def validate(self, data):
         """
@@ -262,8 +263,7 @@ class FollowSerializer(CustomUserSerializer):
         user = self.context.get('request').user
         author = self.instance
         if user == author:
-            raise serializers.ValidationError(
-                'Нельзя подписаться на самого себя.')
+            raise serializers.ValidationError('Нельзя подписаться на самого себя.')
         if Follow.objects.filter(user=user, author=author).exists():
             raise serializers.ValidationError(f'Вы уже подписаны на {author}.')
         return data
@@ -292,4 +292,4 @@ class FollowSerializer(CustomUserSerializer):
         """
         Возвращает количество рецептов у избранного автора.
         """
-        return obj.recipe_set.count()
+        return obj.recipe.count()

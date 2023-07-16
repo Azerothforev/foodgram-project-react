@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from django.db.models import Sum
@@ -8,7 +9,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from rest_framework.pagination import PageNumberPagination
 
 from recipes.models import (
     ShopingCart, FavoriteRecipe, Follow,
@@ -28,6 +29,11 @@ class CustomUsersViewSet(UserViewSet):
     """Вьюсет для обработки всех запросов от пользователей."""
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
+
+    class SubscriptionsPagination(PageNumberPagination):
+        page_size = 10  # Количество элементов на странице
+        page_size_query_param = 'page_size'
+        max_page_size = 100
 
     @action(
         detail=True,
@@ -85,15 +91,17 @@ class CustomUsersViewSet(UserViewSet):
         В выдачу добавляются рецепты.
         """
         subscriptions_data = User.objects.filter(
-            followers__user=request.user)
+            following__user=request.user
+        ).annotate(recipes_count=Count('recipe'))
 
-        page = self.paginate_queryset(subscriptions_data)
+        paginator = self.SubscriptionsPagination()
+        page = paginator.paginate_queryset(subscriptions_data, request)
         serializer = FollowSerializer(
             page,
             many=True,
             context={'request': request}
         )
-        return self.get_paginated_response(serializer.data)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class TagsViewSet(viewsets.ReadOnlyModelViewSet):
