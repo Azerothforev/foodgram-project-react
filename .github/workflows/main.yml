@@ -132,7 +132,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
-          cd kittygram
+          cd foodgram
           sudo docker image rm $(sudo docker images -f "dangling=true" -q)
           # sudo docker system prune —all —force
           # Выполняет pull образов с DockerHub
