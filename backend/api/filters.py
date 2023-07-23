@@ -18,16 +18,11 @@ class IngredientsFilter(filters.FilterSet):
         fields = ('name',)
 
 
-class RecipesFilter(filters.FilterSet):
-    """
-    Фильтрация рецептов по нескольким тегам в комбинации «или».
-    Метод filter_is_favorited - фильтрует queryset по избранных рецептам.
-    Метод filter_is_in_shopping_cart - фильтрует queryset по авторам,
-    на которых подписан пользователь.
-    """
+class RecipeFilter(filters.FilterSet):
     tags = filters.ModelMultipleChoiceFilter(
-        to_field_name='id',
-        queryset=Tag.objects.all()
+        queryset=Tag.objects.all(),
+        field_name='tags__slug',
+        to_field_name='slug',
     )
     is_favorited = filters.BooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = filters.BooleanFilter(
@@ -39,7 +34,7 @@ class RecipesFilter(filters.FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ('tags', 'author',)
+        fields = ('author', 'tags')
 
     def filter_is_favorited(self, queryset, name, value):
         user = self.request.user

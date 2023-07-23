@@ -47,3 +47,5 @@ toml==0.10.2
 typing_extensions==4.6.3
 uritemplate==4.1.1
 urllib3==1.26.16
+django-extensions==3.2.3
+django-import-export==3.2.0

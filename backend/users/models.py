@@ -46,7 +46,6 @@ class FoodgramUser(AbstractUser):
     )
     password = models.CharField(
         max_length=128,
-        blank=False,
         verbose_name='Пароль'
     )
 

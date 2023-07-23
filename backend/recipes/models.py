@@ -1,23 +1,32 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.core.validators import (
     RegexValidator, MinValueValidator, MaxValueValidator)
 
 from users.models import FoodgramUser
 
+MAX_LENGHTH = 20
+
 
 def format_string(field1, field2):
     len_field1 = len(field1)
     len_field2 = len(field2)
-    max_length = 20
 
-    if len_field1 > max_length and len_field2 > max_length:
-        return f'{field1[:max_length]}... - {field2[:max_length]}...'
-    elif len_field1 > max_length and len_field2 <= max_length:
-        return f'{field1[:max_length]}... - {field2}'
-    elif len_field1 <= max_length and len_field2 > max_length:
-        return f'{field1} - {field2[:max_length]}...'
+    if len_field1 > MAX_LENGHTH and len_field2 > MAX_LENGHTH:
+        return f'{field1[:MAX_LENGHTH]}... - {field2[:MAX_LENGHTH]}...'
+    elif len_field1 > MAX_LENGHTH and len_field2 <= MAX_LENGHTH:
+        return f'{field1[:MAX_LENGHTH]}... - {field2}'
+    elif len_field1 <= MAX_LENGHTH and len_field2 > MAX_LENGHTH:
+        return f'{field1} - {field2[:MAX_LENGHTH]}...'
     else:
         return f'{field1} - {field2}'
+
+
+def leight_field(field):
+    if len(field) > MAX_LENGHTH:
+        return field[:MAX_LENGHTH] + '...'
+    else:
+        return field
 
 
 class Tag(models.Model):
@@ -27,8 +36,6 @@ class Tag(models.Model):
     color = models.CharField(
         'Цвет тега',
         unique=True,
-        blank=True,
-        null=True,
         max_length=7,
         validators=[
             RegexValidator(
@@ -51,11 +58,7 @@ class Tag(models.Model):
         verbose_name_plural = 'Теги'
 
     def __str__(self):
-        max_length = 20
-        if len(self.name) > max_length:
-            return self.name[:max_length] + '...'
-        else:
-            return self.name
+        return leight_field(self.name)
 
 
 class Ingredient(models.Model):
@@ -72,11 +75,7 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
-        max_length = 20
-        if len(self.name) > max_length:
-            return self.name[:max_length] + '...'
-        else:
-            return self.name
+        return leight_field(self.name)
 
 
 class Recipe(models.Model):
@@ -98,8 +97,7 @@ class Recipe(models.Model):
         Tag, verbose_name='Список тегов',)
     image = models.ImageField(
         'Изображение',
-        upload_to='recipes/',
-        default=None
+        upload_to='recipes/'
     )
     name = models.CharField('Название рецепта', max_length=200)
     text = models.TextField('Описание рецепта')
@@ -119,11 +117,7 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        max_length = 20
-        if len(self.name) > max_length:
-            return self.name[:max_length] + '...'
-        else:
-            return self.name
+        return leight_field(self.name)
 
 
 class IngredientInRecipe(models.Model):
@@ -144,7 +138,9 @@ class IngredientInRecipe(models.Model):
     amount = models.PositiveSmallIntegerField(
         'Количество ингрединта',
         validators=[
-            MinValueValidator(1, 'Значение должно быть не меньше 1')
+            MinValueValidator(1, 'Значение должно быть не меньше 1'),
+            MaxValueValidator(10000, message='Значение не должно быть '
+                              'больше 10000')
         ]
     )
 
@@ -184,9 +180,14 @@ class Follow(models.Model):
         ordering = ('user',)
         verbose_name = 'Избранный автор'
         verbose_name_plural = 'Подписки на авторов'
+        unique_together = ('user', 'author')
 
     def __str__(self):
         return format_string(self.user.username, self.author.username)
+
+    def clean(self):
+        if self.user == self.author:
+            raise ValidationError('Нельзя подписаться на самого себя.')
 
 
 class ShopingCartAndFavoriteRecipe(models.Model):
@@ -205,7 +206,6 @@ class ShopingCartAndFavoriteRecipe(models.Model):
 
     class Meta:
         abstract = True
-        verbose_name = 'Корзина и избранное'
 
     def __str__(self):
         return format_string(self.user.username, self.recipe.name)

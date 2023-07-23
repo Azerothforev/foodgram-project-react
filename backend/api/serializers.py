@@ -201,14 +201,14 @@ class RecipeAddSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Создание нового рецепта."""
         author = self.context.get('request').user
-        name_recipe = self.validated_data.get('name')
+        text_recipe = self.validated_data.get('text')
 
         if Recipe.objects.filter(
             author=author,
-            name=name_recipe
+            text=text_recipe
         ).exists():
             raise serializers.ValidationError(
-                f'У Вас уже есть рецепт с именем {name_recipe}. '
+                'У Вас уже есть рецепт с таким же описанием. '
                 'Проверьте свой рецепт.'
             )
 

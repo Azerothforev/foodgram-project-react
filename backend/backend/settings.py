@@ -8,7 +8,7 @@ SECRET_KEY = 'wquutvknr#1frd@6y9wc#&eb8g)cxk-#cw%u&)ha9y#21tnxbo'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['51.250.22.108', '127.0.0.1', 'localhost', 'foodgramm.ddnsking.com']
+ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = 'users.FoodgramUser'
 
@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'djoser',
+    'django_extensions',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -63,15 +65,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
+        # Меняем настройку Django: теперь для работы будет использоваться
+        # бэкенд postgresql
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB', 'django'),
         'USER': os.getenv('POSTGRES_USER', 'django'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', 5432),
-        'OPTIONS': {
-            'options': '-c client_encoding=utf8',
-        }
+        'PORT': os.getenv('DB_PORT', 5432)
     }
 }
 

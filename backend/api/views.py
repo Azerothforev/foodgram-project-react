@@ -20,7 +20,7 @@ from .serializers import (
     RecipeAddSerializer, RecipeMinifiedSerializer,
     RecipeSerializer, TagSerializer)
 from .utils import add_del_recipesview
-from .filters import IngredientsFilter, RecipesFilter
+from .filters import IngredientsFilter, RecipeFilter
 
 User = get_user_model()
 
@@ -130,7 +130,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
-    filterset_class = RecipesFilter
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         """
