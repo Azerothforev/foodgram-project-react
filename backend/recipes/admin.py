@@ -36,14 +36,20 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def response_add(self, request, obj, post_url_continue=None):
         if not obj.ingredients.exists():
-            self.message_user(request, "Необходимо добавить хотя бы один ингредиент.", level='ERROR')
-            return HttpResponseRedirect(request.path)  # Остаемся на той же странице
+            self.message_user(
+                request,
+                "Необходимо добавить хотя бы один ингредиент.",
+                level='ERROR')
+            return HttpResponseRedirect(request.path)
         return super().response_add(request, obj, post_url_continue)
 
     def response_change(self, request, obj):
         if not obj.ingredients.exists():
-            self.message_user(request, "Необходимо добавить хотя бы один ингредиент.", level='ERROR')
-            return HttpResponseRedirect(request.path)  # Остаемся на той же странице
+            self.message_user(
+                request,
+                "Необходимо добавить хотя бы один ингредиент.",
+                level='ERROR')
+            return HttpResponseRedirect(request.path)
         return super().response_change(request, obj)
 
 
