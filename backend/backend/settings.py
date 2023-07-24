@@ -3,12 +3,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SECRET_KEY = 'wquutvknr#1frd@6y9wc#&eb8g)cxk-#cw%u&)ha9y#21tnxbo'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['51.250.22.108', '127.0.0.1', 'localhost', 'foodgramm.ddnsking.com']
 
 AUTH_USER_MODEL = 'users.FoodgramUser'
 
