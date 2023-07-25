@@ -1,5 +1,3 @@
-from collections import Counter
-
 from django.contrib.auth import get_user_model
 from django.db.models import F
 from djoser.serializers import UserSerializer
