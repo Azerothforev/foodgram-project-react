@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.http import HttpResponseRedirect
+from django.core.exceptions import ValidationError
 from .models import (
     Tag, Ingredient, Recipe, FavoriteRecipe,
     Follow, ShopingCart, IngredientInRecipe
@@ -33,20 +33,14 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def response_add(self, request, obj, post_url_continue=None):
         if not obj.ingredients.exists():
-            self.message_user(
-                request,
-                "Необходимо добавить хотя бы один ингредиент.",
-                level='ERROR')
-            return HttpResponseRedirect(request.path)
+            raise ValidationError(
+                'Необходимо добавить хотя бы один ингредиент.')
         return super().response_add(request, obj, post_url_continue)
 
     def response_change(self, request, obj):
         if not obj.ingredients.exists():
-            self.message_user(
-                request,
-                "Необходимо добавить хотя бы один ингредиент.",
-                level='ERROR')
-            return HttpResponseRedirect(request.path)
+            raise ValidationError(
+                'Необходимо добавить хотя бы один ингредиент.')
         return super().response_change(request, obj)
 
 

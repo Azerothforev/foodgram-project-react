@@ -1,4 +1,5 @@
 from django_filters import rest_framework as filters
+from rest_framework.filters import OrderingFilter
 
 from recipes.models import FavoriteRecipe, Ingredient, Recipe, ShopingCart, Tag
 
@@ -55,3 +56,12 @@ class RecipeFilter(filters.FilterSet):
     def filter_is_subscribed(self, queryset, name, value):
         user = self.request.user
         return queryset.filter(author=user)
+
+
+class RecipeOrderingFilter(OrderingFilter):
+    def get_default_ordering(self, view):
+        """
+        Определяет значение сортировки по умолчанию.
+        Сортировка по убыванию ID.
+        """
+        return ['-id']

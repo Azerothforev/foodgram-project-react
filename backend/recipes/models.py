@@ -29,6 +29,11 @@ def leight_field(field):
         return field
 
 
+def lowercase_validator(value):
+    if value != value.lower():
+        raise ValidationError("Цвет тега должен быть в нижнем регистре.")
+
+
 class Tag(models.Model):
     """Модель для хранения тегов."""
 
@@ -39,11 +44,13 @@ class Tag(models.Model):
         max_length=7,
         validators=[
             RegexValidator(
-                regex=r'^#[A-Za-z0-9]{0,6}$',
+                regex=r'^#[a-z0-9]{0,6}$',
                 message='Неверное значение. Допускаются только цифры, '
                 'символ #(обратите внимание,что символ # должен быть первым )'
-                'и английские буквы.'
-            )
+                'и английские буквы в нижнем регистре.',
+                code='invalid_color',
+            ),
+            lowercase_validator,
         ],
     )
     slug = models.CharField(
@@ -230,6 +237,7 @@ class FavoriteRecipe(ShopingCartAndFavoriteRecipe):
     class Meta:
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
+        unique_together = ('user', 'recipe')
 
 
 class ShopingCart(ShopingCartAndFavoriteRecipe):
@@ -251,3 +259,4 @@ class ShopingCart(ShopingCartAndFavoriteRecipe):
     class Meta:
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзины'
+        unique_together = ('user', 'recipe')

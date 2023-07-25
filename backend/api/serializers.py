@@ -1,3 +1,5 @@
+from collections import Counter
+
 from django.contrib.auth import get_user_model
 from django.db.models import F
 from djoser.serializers import UserSerializer
@@ -209,7 +211,8 @@ class RecipeAddSerializer(serializers.ModelSerializer):
         ).exists():
             raise serializers.ValidationError(
                 'У Вас уже есть рецепт с таким же описанием. '
-                'Проверьте свой рецепт.'
+                'Проверьте свой рецепт.',
+                code=400,
             )
 
         return create_update_recipes(validated_data, author=author)
@@ -217,15 +220,26 @@ class RecipeAddSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Обновление рецепта."""
         instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
         instance.image = validated_data.get('image', instance.image)
         instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
-        )
+            'cooking_time',
+            instance.cooking_time)
+
+        new_text = validated_data.get('text', instance.text)
+        author = self.context.get('request').user
+
+        if new_text != instance.text:
+            # Если поле 'text' обновляется, проверяем наличие дубликатов
+            if Recipe.objects.filter(author=author, text=new_text) \
+                    .exclude(id=instance.id).exists():
+                raise serializers.ValidationError(
+                    'У Вас уже есть рецепт с таким же описанием. '
+                    'Проверьте свой рецепт.'
+                )
+            instance.text = new_text
 
         old_ingredients = IngredientInRecipe.objects.filter(
-            recipe_id=instance.id
-        )
+            recipe_id=instance.id)
         old_ingredients.delete()
         create_update_recipes(validated_data, instance=instance)
 

@@ -1,14 +1,16 @@
 import os
 from dotenv import load_dotenv
 
+from .methods import get_bool_env
+
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 SECRET_KEY = os.getenv('SECRET_KEY')
 
+DEBUG = get_bool_env('DEBUG', True)
 
-DEBUG = os.getenv('DEBUG')
-
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'foodgramm.ddnsking.com']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', [])
 
 AUTH_USER_MODEL = 'users.FoodgramUser'
 

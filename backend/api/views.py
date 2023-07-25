@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
+
 from recipes.models import (
     ShopingCart, FavoriteRecipe, Follow,
     Ingredient, Recipe, Tag, IngredientInRecipe)
@@ -20,7 +21,8 @@ from .serializers import (
     RecipeAddSerializer, RecipeMinifiedSerializer,
     RecipeSerializer, TagSerializer)
 from .utils import add_del_recipesview
-from .filters import IngredientsFilter, RecipeFilter
+from .filters import (
+    IngredientsFilter, RecipeFilter, RecipeOrderingFilter)
 
 User = get_user_model()
 
@@ -128,7 +130,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, RecipeOrderingFilter)
     permission_classes = (IsAuthorOrReadOnly | IsAdminOrReadOnly,)
     filterset_class = RecipeFilter
 
