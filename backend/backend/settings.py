@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = get_bool_env('DEBUG', True)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'foodgramm.ddnsking.com']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 AUTH_USER_MODEL = 'users.FoodgramUser'
 
