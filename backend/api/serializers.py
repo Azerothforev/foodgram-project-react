@@ -227,7 +227,6 @@ class RecipeAddSerializer(serializers.ModelSerializer):
         author = self.context.get('request').user
 
         if new_text != instance.text:
-            # Если поле 'text' обновляется, проверяем наличие дубликатов
             if Recipe.objects.filter(author=author, text=new_text) \
                     .exclude(id=instance.id).exists():
                 raise serializers.ValidationError(
